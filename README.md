@@ -40,3 +40,6 @@ pop     esi
 pop     ebp
 retn    18h
 ```
+
+## Alternative approach
+An alternative approach which also bypasses anti-loadlibrary protection is to restore `5` first bytes of original [NtOpenFile](https://docs.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntopenfile).

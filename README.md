@@ -42,4 +42,13 @@ retn    18h
 ```
 
 ## Alternative approach
-An alternative approach which also bypasses anti-loadlibrary protection is to restore `5` first bytes of original [NtOpenFile](https://docs.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntopenfile).
+An alternative approach which also bypasses anti-loadlibrary protection is to restore `5` first bytes of original [NtOpenFile](https://docs.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntopenfile). Below is an example of that coded in C:
+```c
+// Restore original NtOpenFile from external process
+LPVOID ntOpenFile = GetProcAddress(LoadLibraryW(L"ntdll"), "NtOpenFile");
+if (ntOpenFile) {
+    char originalBytes[5];
+    memcpy(originalBytes, ntOpenFile, 5);
+    WriteProcessMemory(csgoProcessHandle, ntOpenFile, originalBytes, 5, NULL);
+}
+```

@@ -11,18 +11,18 @@ push    esi
 mov     esi, [ebp+arg_8]
 mov     eax, [esi+8]
 mov     eax, [eax+4]
-test    eax, eax
+test    eax, eax ; is ObjectAttributes->ObjectName->Buffer not null
 jz      short loc_4095BB ; we patch this to skip loc_4095A1
 
 loc_4095A1:
 
 test    byte ptr [ebp+arg_4], 20h ; check if DesiredAccess is equal FILE_EXECUTE
 jz      short loc_4095BB
-push    eax
+push    eax ; ObjectAttributes->ObjectName->Buffer
 call    sub_40D460
 test    al, al
 jnz     short loc_4095BB
-mov     eax, 0C0000034h
+mov     eax, 0C0000034h ; return STATUS_OBJECT_NAME_NOT_FOUND
 pop     esi
 pop     ebp
 retn    18h

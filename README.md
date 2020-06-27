@@ -16,7 +16,7 @@ jz      short loc_4095BB ; we patch this to skip loc_4095A1
 
 loc_4095A1:
 
-test    byte ptr [ebp+arg_4], 20h
+test    byte ptr [ebp+arg_4], 20h ; check if DesiredAccess is equal FILE_EXECUTE
 jz      short loc_4095BB
 push    eax
 call    sub_40D460

@@ -20,7 +20,7 @@ test    byte ptr [ebp+arg_4], 20h ; check if DesiredAccess is equal FILE_EXECUTE
 jz      short loc_4095BB
 push    eax ; ObjectAttributes->ObjectName->Buffer
 call    sub_40D460
-test    al, al
+test    al, al ; check if dll is allowed to load
 jnz     short loc_4095BB
 mov     eax, 0C0000034h ; return STATUS_OBJECT_NAME_NOT_FOUND
 pop     esi

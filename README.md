@@ -12,16 +12,16 @@ mov     esi, [ebp+arg_8]
 mov     eax, [esi+8]
 mov     eax, [eax+4]
 test    eax, eax ; is ObjectAttributes->ObjectName->Buffer not null
-jz      short loc_4095BB ; we patch this to skip loc_4095A1
+jz      short loc_4095BB ; we patch this with 'jmp' to skip loc_4095A1
 
 loc_4095A1:
 
-test    byte ptr [ebp+arg_4], 20h ; check if DesiredAccess is equal FILE_EXECUTE
-jz      short loc_4095BB
+test    byte ptr [ebp+arg_4], 20h ; check if DesiredAccess has FILE_EXECUTE flag set (whether we're loading a dll)
+jz      short loc_4095BB ; if it's not a dll, call original
 push    eax ; ObjectAttributes->ObjectName->Buffer
-call    sub_40D460
+call    sub_40D460 ; verify the dll
 test    al, al ; check if dll is allowed to load
-jnz     short loc_4095BB
+jnz     short loc_4095BB ; if the dll passed verification call original
 mov     eax, 0C0000034h ; return STATUS_OBJECT_NAME_NOT_FOUND
 pop     esi
 pop     ebp

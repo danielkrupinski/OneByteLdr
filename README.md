@@ -54,8 +54,8 @@ if (ntOpenFile) {
 ```
 
 ## Thread creation detection
-Many dll injectors (both LoadLibrary and Manual Mapping) creates thread in target process to load dll or perform initialization. This is what CS:GO devs seem to target in addition to LoadLibrary detection.
+Many dll injectors (both LoadLibrary and Manual Mapping) create thread in target process to load dll or perform initialization. This is what CS:GO devs seem to target in addition to LoadLibrary detection.
 
-`DllMain` of `client.dll` contains code that calls **NtQueryInformationThread** function from `ntdll.dll`.
+`DllMain` function of `client.dll` contains code that calls **NtQueryInformationThread** function from `ntdll.dll`.
 
-TODO: bypass this
+TODO: research & bypass this

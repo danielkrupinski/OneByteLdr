@@ -54,8 +54,77 @@ if (ntOpenFile) {
 ```
 
 ## Thread creation detection
-Many dll injectors (both LoadLibrary and Manual Mapping) create thread in target process to load dll or perform initialization. This is what CS:GO devs seem to target in addition to LoadLibrary detection.
+Many dll injectors (both LoadLibrary and Manual Mapping) create thread in target process to load dll or perform initialization. This is what CS:GO devs target in addition to LoadLibrary detection.
 
-`DllMain` function of `client.dll` contains code that calls **NtQueryInformationThread** function from `ntdll.dll`.
+`DllMain` function of `client.dll` contains code that calls **NtQueryInformationThread** function from `ntdll.dll` to get **start address of current thread**:
 
-TODO: research & bypass this
+```asm
+push    ebp
+mov     ebp, esp
+mov     eax, [ebp+fdwReason]
+sub     esp, 20h
+cmp     eax, 1
+jz      loc_106390D3 ; if fdwReason is DLL_PROCESS_ATTACH, skip
+test    eax, eax
+jz      loc_106390D3 ; if fdwReason is DLL_PROCESS_DETACH, skip
+cmp     eax, 2
+jnz     loc_106390D3 ; if fdwReason is not DLL_THREAD_ATTACH, skip
+push    esi
+push    edi
+mov     [ebp+phModule], 0
+call    ds:GetCurrentThreadId
+push    offset aNtqueryinforma ; "NtQueryInformationThread"
+push    offset aNtdllDll ; "ntdll.dll"
+mov     edi, eax
+call    ds:GetModuleHandleA
+push    eax
+call    ds:GetProcAddress
+mov     esi, eax
+test    esi, esi
+jz      short loc_106390C6 ; we patch this with 'jmp' to skip loc_106390B2
+push    0
+push    4
+lea     eax, [ebp+fdwReason]
+push    eax
+push    9 ; ThreadQuerySetWin32StartAddress
+call    ds:GetCurrentThread
+push    eax
+call    esi ; get thread start address from NtQueryInformationThread
+test    eax, eax
+jnz     short loc_106390C6
+push    1Ch
+lea     eax, [ebp+Buffer]
+push    eax
+push    [ebp+fdwReason]
+call    ds:VirtualQuery
+lea     eax, [ebp+phModule]
+push    eax
+push    [ebp+fdwReason]
+push    6
+call    ds:GetModuleHandleExA
+mov     ecx, [ebp+Buffer.Protect]
+test    eax, eax ; check if the address leads to a valid module
+jz      short loc_106390B2
+cmp     ecx, 40h
+jnz     short loc_106390C6
+
+loc_106390B2:
+mov     eax, [ebp+fdwReason]
+mov     dword_1528625C, eax
+mov     dword_15286260, edi
+mov     dword_15286264, ecx
+
+loc_106390C6:
+pop     edi
+mov     eax, 1
+pop     esi
+mov     esp, ebp
+pop     ebp
+retn    0Ch
+
+loc_106390D3:
+mov     eax, 1
+mov     esp, ebp
+pop     ebp
+retn    0Ch
+```

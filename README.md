@@ -54,7 +54,7 @@ if (ntOpenFile) {
 ```
 
 ## Thread creation detection
-Many dll injectors (both LoadLibrary and Manual Mapping) create thread in target process to load dll or perform initialization. This is what CS:GO devs target in addition to LoadLibrary detection.
+Many Manual Mapping dll injectors create thread in target process to load dll or perform initialization. This is what CS:GO devs target in addition to LoadLibrary detection. **Thread detection doesn't affect LoadLibrary injectors**.
 
 `DllMain` function of `client.dll` contains code that calls **NtQueryInformationThread** function from `ntdll.dll` to get **start address of current thread**:
 
@@ -104,7 +104,7 @@ push    6
 call    ds:GetModuleHandleExA
 mov     ecx, [ebp+Buffer.Protect]
 test    eax, eax ; check if the address leads to a valid module
-jz      short loc_106390B2
+jz      short loc_106390B2 ; if the code's been manually mapped save thread's characteristics
 cmp     ecx, 40h
 jnz     short loc_106390C6
 

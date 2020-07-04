@@ -53,10 +53,12 @@ if (ntOpenFile) {
 }
 ```
 
+For increased safety you can backup the patched first five bytes of NtOpenFile and restore them after injection.
+
 ## Thread creation detection
 Many Manual Mapping dll injectors create thread in target process to load dll or perform initialization. This is what CS:GO devs target in addition to LoadLibrary detection. **Thread detection doesn't affect LoadLibrary injectors**.
 
-`DllMain` function of `client.dll` contains code that calls **NtQueryInformationThread** function from `ntdll.dll` to get **start address of current thread**:
+`DllMain` function of `client.dll` contains code that on  **DLL_THREAD_ATTACH** calls **NtQueryInformationThread** function from `ntdll.dll` to get **start address of newly created thread**:
 
 ```asm
 push    ebp

@@ -112,9 +112,9 @@ jnz     short loc_106390C6
 
 loc_106390B2:
 mov     eax, [ebp+fdwReason]
-mov     dword_1528625C, eax
-mov     dword_15286260, edi
-mov     dword_15286264, ecx
+mov     dword_1528625C, eax ; save thread start address
+mov     dword_15286260, edi ; save thread id
+mov     dword_15286264, ecx ; save protection of memory at thread start address
 
 loc_106390C6:
 pop     edi

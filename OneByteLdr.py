@@ -20,7 +20,7 @@ client = pymem.process.module_from_name(pm.process_handle,
                                         'client.dll')
 
 clientModule = pm.read_bytes(client.lpBaseOfDll, client.SizeOfImage)
-address = client.lpBaseOfDll + re.search(rb'.\x5A\x6A\x00\x6A\x04',
+address = client.lpBaseOfDll + re.search(rb'.\x69\x6A\x00\x6A\x04',
                                          clientModule).start()
 
 pm.write_uchar(address, 0xEB if pm.read_uchar(address) == 0x74 else 0x74)
